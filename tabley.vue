@@ -8,8 +8,8 @@
         </div>
         <div class="ant-modal-footer" style="text-align: right;">
           
-          <button @click="importE">导入excel</button>
-          <button class="primary" @click="replaceLang('en')" >替换英文</button>
+          <button @click="importE">导入excel替换英文</button>
+          <!--<button class="primary" @click="replaceLang('en')" >替换英文</button>-->
         
           <button class="primary" @click="generateEnLang('enLabel')">生成英文</button>
         </div>
@@ -84,6 +84,8 @@ export default {
             }
           })
           this.canReplace =true
+
+          this.replaceLang('en')
         })
       },
       /**
@@ -95,15 +97,15 @@ export default {
         switch(lang){
           case 'en':
             arr.forEach((item)=>{
-              if(item[lang+'label']!== this.enMap.get(item['key'])){
-                item[lang+'label'] = this.enMap.get(item['key']);
+              if(item[lang+'Label']!== this.enMap.get(item['key'])){
+                item[lang+'Label'] = this.enMap.get(item['key']);
               } 
             });
             break;
           case 'zh':
             arr.forEach((item)=>{
-              if(item[lang+'label']!== this.zhMap.get(item['key'])){
-                item[lang+'label'] = this.zhMap.get(item['key']);
+              if(item[lang+'Label']!== this.zhMap.get(item['key'])){
+                item[lang+'Label'] = this.zhMap.get(item['key']);
               } 
             });
             break;
