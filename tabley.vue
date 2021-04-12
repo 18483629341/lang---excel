@@ -11,9 +11,12 @@
           <button @click="importE">导入excel替换英文</button>
           <!--<button class="primary" @click="replaceLang('en')" >替换英文</button>-->
         
-          <button class="primary" @click="generateEnLang('enLabel')">生成英文</button>
+          <button class="primary" @click="generateLang('enLabel', 'en.ts')">生成英文</button>
+         
         </div>
-        
+        <div class="ant-modal-footer" style="text-align: right;">
+          <button @click="replaceAll">中英文全部替换</button>
+        </div>
       </div>
       
       <table class="table" id="myTab">
@@ -24,12 +27,11 @@
             <td class="td"><b>英文</b></td>
           </tr>
         </thead>
-        <tbody>
+        <tbody v-if="isShow">
           <tr
             v-for="(row, index) in tableScoreData"
-            :key="index"
           >
-            <td v-for="(item, i) in row" :key="i" class="td">{{item}}</td>
+            <td v-for="(item) in row" class="td">{{item}}</td>
           </tr>
         </tbody>
       </table>
@@ -50,7 +52,8 @@ export default {
         newData:{},
         canReplace: false,
         zhMap: null,
-        enMap: null
+        enMap: null,
+        isShow: true
       }
     },
 	mixins: [tableToExcel, init],
@@ -73,7 +76,6 @@ export default {
         Excel.importExcel((data, dataRef) => {
           this.zhMap = new Map()
           this.enMap = new Map()
-           console.log(data);
           data.forEach((item,i)=>{
             if(i>0){
               let key=item[0];
@@ -84,8 +86,30 @@ export default {
             }
           })
           this.canReplace =true
-
           this.replaceLang('en')
+        })
+      },
+      replaceAll(){
+        let newData = []
+         // 保存数据，生成中英文map数据
+        Excel.importExcel((data, dataRef) => {
+          data.forEach((item,i)=>{
+            if(i>0){
+              let obj={
+                key: item[0],
+                zhLabel: item[1],
+                enLabel: item[2],
+              }
+              newData.push(obj)
+            }
+          })
+          this.isShow = false
+          this.tableScoreData = [...newData]
+          this.isShow = true
+          this.generateLang('zhLabel', 'zh.ts');
+          setTimeout(()=>{
+            this.generateLang('enLabel', 'en.ts');
+          }, 10*1000)
         })
       },
       /**
@@ -93,6 +117,7 @@ export default {
        */
       replaceLang(lang){
         let arr = [...this.tableScoreData];
+        console.log(arr);
         let map = new Map()
         switch(lang){
           case 'en':
@@ -118,17 +143,18 @@ export default {
         // console.log(arr);
         this.tableScoreData = [...arr]
       },
-      generateEnLang(label){
+      generateLang(label,fileName){
         let tableData=JSON.parse(JSON.stringify(this.tableScoreData))
         // 生成lang树
         // 参数1为表格数据 ，参数2为需要转出语言包的所在列的下标；比如英语所在列为2
-        let enTree=getTree.getTree(tableData, 'enLabel');
+        console.log(tableData)
+        let enTree=getTree.getTree(tableData, label);
         // console.log(enTree)
         // 将json转换成字符串
         let data = JSON.stringify(enTree)
               data = 'export default' + data
         const blob = new Blob([data], {type: ''})
-        FileSaver.saveAs(blob, 'en.ts')
+        FileSaver.saveAs(blob, fileName)
       }
 
     }

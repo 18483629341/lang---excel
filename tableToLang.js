@@ -15,6 +15,10 @@
     let classifyNode ={};
     // 找到所有一级的key
     node.forEach((item)=>{
+      // debugger
+      // if(!item['key']){
+      //   return
+      // }
       let oneLevelProp=item['key'].split('.')[0];
       if(firstLevelPropArr.indexOf(oneLevelProp) === -1){
         firstLevelPropArr.push(oneLevelProp);
